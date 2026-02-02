@@ -1,0 +1,30 @@
+name: Publish
+run-name: Publishing
+on:
+  workflow_dispatch: # run when triggered manually
+jobs:
+  build-and-publish:
+    name: Build and publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24.13.0"
+          cache: "npm"
+          cache-dependency-path: |
+            package-lock.json
+      - name: Install dependencies
+        run: npm ci
+      - name: Build
+        run: npm run build -- --base-href=/trombi/ --deploy-url=/trombi/
+      - name: Publish to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: dist/trombi/browser
+          keep_files: true
+          allow_empty_commit: false
+          commit_message: "Publish"

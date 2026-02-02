@@ -1,0 +1,52 @@
+<div class="no-print toolbar">
+  <div class="header">
+    <h2>Générateur de Trombinoscope</h2>
+    <p class="subtitle">Importez vos photos pour générer la grille.</p>
+  </div>
+
+  <div class="controls">
+    <div class="control-group">
+      <label>Format Papier</label>
+      <div class="btn-group">
+        <button (click)="setPaperSize('A4')" [class.active]="paperSize() === 'A4'">A4</button>
+        <button (click)="setPaperSize('A5')" [class.active]="paperSize() === 'A5'">A5</button>
+        <button (click)="setPaperSize('A6')" [class.active]="paperSize() === 'A6'">A6</button>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <label>Grille</label>
+      <div class="btn-group">
+        <button (click)="setGridSize(3)" [class.active]="gridSize() === 3">3 Colonnes</button>
+        <button (click)="setGridSize(4)" [class.active]="gridSize() === 4">4 Colonnes</button>
+      </div>
+    </div>
+
+    <div class="control-group upload-group" (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)"
+      (drop)="onDrop($event)" [class.dragging]="isDragging()">
+      <label for="file-upload" class="upload-btn">
+        Choisir des fichiers...
+        <br>
+        <small>ou glisser-déposer ici</small>
+      </label>
+      <input id="file-upload" type="file" multiple (change)="onFileSelected($event)" accept="image/*">
+      @if (trombi().length > 0) {
+        <span class="file-count">{{ trombi().length }} images chargées</span>
+      }
+      @if (imagesInError().length > 0) {
+        <span class="file-count error">Dont {{ imagesInError().length }} images en erreur</span>
+      }
+    </div>
+  </div>
+</div>
+
+<ul class="trombi" [class]="`patchwork-${gridSize()}-${gridSize()} ${paperSize()}`">
+  @for (person of trombi(); track person.name) {
+    <li class="person" [class.error]="!person.city || !person.year" [title]="person.errorMessage">
+      <img [src]="person.image" [alt]="person.name">
+      <span class="data name">{{ person.name }}</span>
+      <span class="data city">{{ person.city }}</span>
+      <span class="data year">{{ person.year }}</span>
+    </li>
+  }
+</ul>
